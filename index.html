@@ -1,0 +1,327 @@
+<html><head><base href="." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #1a1a2e, #16213e);
+    color: #fff;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    direction: rtl;
+  }
+
+  .chat-container {
+    width: 90%;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .alien {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .alien-avatar {
+    width: 80px;
+    height: 80px;
+    margin-left: 15px;
+  }
+
+  .alien-avatar-small {
+    width: 50px;
+    height: 50px;
+    margin-left: 15px;
+  }
+
+  .astronaut-avatar {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+  }
+
+  .message {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.5s forwards;
+    margin-bottom: 20px;
+  }
+
+  .question {
+    background: rgba(103, 58, 183, 0.3);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+
+  .answer-input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+
+  .answer-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .submit-btn {
+    background: #673AB7;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    background: #5E35B1;
+    transform: scale(1.05);
+  }
+
+  .formula {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-family: monospace;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .avatar {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+  }
+
+  .message-container {
+    display: flex;
+    align-items: start;
+    margin-bottom: 20px;
+  }
+
+  .astronaut-helmet {
+    width: 50px;
+    height: 50px;
+    filter: invert(1);
+  }
+
+  .answer-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="alien">
+    <img class="alien-avatar" src="/a/6131f10c-ff23-46d3-9eef-6cc1d22dc44e" alt="חזי החייזר" />
+    <h2>שלום! אני חזי החייזר, נעים להכיר!</h2>
+  </div>
+
+  <div id="chat">
+  </div>
+</div>
+
+<script>
+const content = [
+    {
+        question: "איך קוראים לך?",
+        isInput: true,
+        validation: {
+            type: "any"
+        }
+    },
+    {
+        question: "הבנתי שצריך תזכורת לחישובי אנרגיה מתגובה נתונה. בכללי, שינוי האנטלפיה בתגובה הינו למספר מולי החומר כפי שרשומים בניסוח התגובה. נראה אם זה ברור....<br><br>נתונה התגובה:<br>2Fe<sub>2</sub>O<sub>3</sub><sub>(s)</sub>+3C<sub>(s)</sub>→4Fe<sub>(s)</sub>+3CO<sub>2</sub><sub>(g)</sub> ΔH=468 kJ<br>אם הגיבו 3 מול פחמן מה יהיה שינוי האנרגיה בתגובה ?",
+        isInput: true,
+        validation: {
+            type: "energy",
+            value: 468,
+            responses: {
+                correct: "נכון מאוד!",
+                noUnits: "הערך נכון אבל יש להקפיד לרשום יחידות. היחידות הן kJ",
+                wrong: "בניסוח התגובה המקדם של פחמן הוא 3, ושינוי האנרגיה הנתון הוא 468 קילו ג'אול. המשמעות היא ששינוי האנרגיה ל-3 מול פחמן הוא 468 קילו ג'אול."
+            }
+        }
+    },
+    {
+        question: "באותה תגובה, מה יהיה שינוי האנרגיה ל-1 מול פחמן?",
+        isInput: true,
+        validation: {
+            type: "energy",
+            value: 156,
+            responses: {
+                correct: "כל הכבוד! פשוט תותחים!",
+                noUnits: "הערך נכון אבל יש להקפיד לרשום יחידות ליד הערך המספרי. היחידות הן kJ",
+                wrong: "הפעם יש לחלק את האנרגיה הנתונה ב-3. שינוי אנרגיה הנתון הוא עבור 3 מול פחמן ואנו מעוניינים בשינוי האנרגיה ל-1 מול פחמן אחד בלבד. לכן התשובה היא 156 קילוג'אול  (468/3)"
+            }
+        }
+    },
+    {
+        question: "נסתכל בתגובה נוספת.<br>2Mg<sub>(s)</sub>+O<sub>2</sub><sub>(g)</sub>→2MgO<sub>(s)</sub> ΔH=-1200 kJ<br>כמה אנרגיה תפלט אם נשתמש ב-2 מול גז חמצן?",
+        isInput: true,
+        validation: {
+            type: "energy",
+            value: 2400,
+            responses: {
+                correct: "נהדר! יש שליטה בחומר!",
+                noUnits: "הערך נכון אבל לא רשמת יחידות. יש להקפיד על רישום יחידות ליד הערך המספרי. יש לרשום את התשובה בצורה הבאה: 2400 kJ",
+                wrong: "על פי ניסוח התגובה ושינוי האנטלפיה הנתון: בתגובה הנתונה נפלטים 1200 kJ, לפי ניסוח התגובה נראה שמשתמשים ב-1 מול חמצן (המקדם של חמצן במגיבים הוא 1). לכן, עבור 2 מול חמצן, תפלט אנרגיה בסך 2400 kJ  (1200*2)."
+            }
+        }
+    },
+    {
+        question: "אפשר לשנות את הנתונים, ובמקום לתת מספר מולים, לתת מסה, לדוגמה. הפעם יהיה עלינו להעביר את הנתון ממסה למול ולאחר מכן לחשב את האנרגיה המתאימה לדוגמה ידוע שהגיבו 12 גרם מגנזיום בתגובה:<br>2Mg<sub>(s)</sub>+O<sub>2</sub><sub>(g)</sub>→2MgO<sub>(s)</sub> ΔH=-1200kJ<br>כמה אנרגיה תפלט?",
+        isInput: true,
+        validation: {
+            type: "energy",
+            value: 300,
+            responses: {
+                correct: "נהדר! יש שליטה בחומר!",
+                noUnits: "הערך נכון, אבל יש להקפיד לרשום יחידות ליד הערך המספרי. יש לרשום את התשובה בצורה הבאה: 300 kJ",
+                wrong: "12 גרם מגנזיום הם 0.5 מול מגנזיום (המסה המולרית של מגנזיום היא 24 גרם/מול). על פי ניסוח  התגובה כאשר השתמשנו ב-2 מול מגנזיום נפלטו 1200 קילו ג'אול. ולכן, עבור 0.5 מול מגנזיום יפלטו 300 קילו ג'אול"
+            }
+        }
+    },
+    {
+        question: "נחזור לתגובה הראשונה:<br>2Fe<sub>2</sub>O<sub>3</sub><sub>(s)</sub>+3C<sub>(s)</sub>→4Fe<sub>(s)</sub>+3CO<sub>2</sub><sub>(g)</sub> ΔH=468 kJ<br>כמה אנרגיה יש להשקיע אם ידוע שנוצרו 4.4 גרם פחמן דו חמצני?",
+        isInput: true,
+        validation: {
+            type: "energy",
+            value: 15.6,
+            responses: {
+                correct: "מעולה!",
+                noUnits: "הערך נכון, אבל יש להקפיד לרשום יחידות ליד הערך המספרי. יש לרשום את התשובה בצורה הבאה: 15.6 kJ",
+                wrong: "4.4 גרם פחמן דו חמצני הם 0.1 מול פחמן דו חמצני (המסה המולרית של פחמן דו חמצני היא 44 גרם/מול). על פי ניסוח  התגובה כאשר נוצרו ב-3 מול פחמן דו חמצני נדרשו 486 קילו ג'אול. לכן, עבור 0.1 מול מגנזיום ידרשו 15.6 קילו ג'אול."
+            }
+        }
+    },
+    {
+        question: "מקוה שחישוב שינוי האנרגיה בתגובה בדרך זו ברור יותר. הבנתי שיש לך בעיה עם גוש השוקולד שעליך להפשיר. בנוף בכוכב מסתתר מידע שעשוי לעזור",
+        isInput: false
+    }
+];
+
+let currentQuestion = 0;
+const chat = document.getElementById('chat');
+
+function validateEnergy(input, correctValue) {
+    const normalizedInput = input.toLowerCase().replace(/\s+/g, '');
+    const value = parseFloat(normalizedInput);
+    
+    const validUnits = ['kj', 'קילוג\'אול', 'קילוג׳אול', 'קילוג\'ול', 'קילוגאול', 'קילוג׳ול', 'קילוגול'];
+    const hasValidUnit = validUnits.some(unit => normalizedInput.endsWith(unit));
+    
+    if (value === correctValue && hasValidUnit) {
+        return "correct";
+    } else if (value === correctValue) {
+        return "noUnits";
+    }
+    return "wrong";
+}
+
+function createMessageElement(content, isUser = false) {
+    const container = document.createElement('div');
+    container.className = 'message-container';
+    
+    const avatar = document.createElement('img');
+    avatar.src = "/a/6131f10c-ff23-46d3-9eef-6cc1d22dc44e";
+    avatar.className = 'alien-avatar-small';
+    avatar.alt = "חזי החייזר";
+    container.appendChild(avatar);
+    return container;
+}
+
+function showContent() {
+    if (currentQuestion < content.length) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        
+        if (content[currentQuestion].isInput) {
+            const container = createMessageElement(content[currentQuestion], false);
+            messageDiv.innerHTML = `
+                <div class="question">${content[currentQuestion].question}</div>
+                <div class="answer-wrapper">
+                    <input type="text" class="answer-input" placeholder="הקלד את תשובתך כאן...">
+                    <img src="/a/89b68885-9942-4d34-85d4-c227d5136a72" class="astronaut-avatar" alt="קסדת אסטרונאוט">
+                </div>
+                <button class="submit-btn">שלח</button>
+            `;
+            container.appendChild(messageDiv);
+            chat.appendChild(container);
+            
+            const button = messageDiv.querySelector('.submit-btn');
+            const input = messageDiv.querySelector('.answer-input');
+
+            button.addEventListener('click', () => handleAnswer(input.value));
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleAnswer(input.value);
+            });
+        } else {
+            const container = createMessageElement(content[currentQuestion], false);
+            messageDiv.innerHTML = `<div class="question">${content[currentQuestion].question}</div>`;
+            container.appendChild(messageDiv);
+            chat.appendChild(container);
+            
+            setTimeout(() => {
+                currentQuestion++;
+                showContent();
+            }, 2000);
+        }
+    }
+}
+
+function handleAnswer(answer) {
+    const currentContent = content[currentQuestion];
+    let response;
+    
+    if (currentContent.validation.type === "energy") {
+        const result = validateEnergy(answer, currentContent.validation.value);
+        response = currentContent.validation.responses[result];
+    } else {
+        currentQuestion++;
+        showContent();
+        return;
+    }
+    
+    const responseDiv = createMessageElement(true);
+    responseDiv.innerHTML = `<div class="question">${response}</div>`;
+    chat.appendChild(responseDiv);
+    
+    currentQuestion++;
+    setTimeout(showContent, 1000);
+}
+
+showContent();
+</script>
+
+</body>
